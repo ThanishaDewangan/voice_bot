@@ -20,7 +20,7 @@
       const res = await fetch('/get-token', { method: 'POST' });
       const { token } = await res.json();
 
-      const client = new BlandWebClient('8909c009-67c1-4b9e-8321-8191f0ad9ae2', token);
+      const client = new BlandWebClient('115c8721-3bd0-4921-8ee0-6a758e24a9c4', token);
       await client.initConversation({ sampleRate: 44100 });
 
       const transcriptBox = document.getElementById('transcript');

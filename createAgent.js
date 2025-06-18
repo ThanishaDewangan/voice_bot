@@ -20,7 +20,7 @@ const createAgent = async () => {
     max_duration: 10,
     interruption_threshold: 100,
     tools: [
-      "TL-ae2fb515-7df3-49f2-bd8d-3cc655597163", "TL-365762dc-1b4f-4359-a34e-6d7cb7039c51"
+      "TL-034cb337-e9aa-46c8-9637-7bf00d85f871", "TL-e9c51f27-1eb1-44e8-9f5d-853e325b2c1d"
     ],
     analysis_schema: {
       exchange_selected: "string",
