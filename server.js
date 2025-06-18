@@ -37,9 +37,7 @@ app.post('/get-token', async (req, res) => {
   try {
     const response = await axios.post(
       'https://web.bland.ai/v1/token',
-      {
-        user_id: 'web_user_' + Date.now()
-      },
+      { user_id: 'web_' + Date.now() },
       {
         headers: {
           Authorization: `Bearer ${process.env.BLAND_API_KEY}`
@@ -50,7 +48,7 @@ app.post('/get-token', async (req, res) => {
     res.json({ token: response.data.token });
   } catch (err) {
     console.error('Token fetch failed:', err.response?.data || err.message);
-    res.status(500).json({ error: 'Failed to fetch token' });
+    res.status(500).json({ error: 'Token fetch failed' });
   }
 });
 
