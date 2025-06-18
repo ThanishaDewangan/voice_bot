@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OTC Trading Bot</title>
+  <script src="https://cdn.jsdelivr.net/npm/@bland-ai/web-sdk@latest/dist/bland.min.js"></script>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+    button { padding: 10px 20px; font-size: 16px; margin: 10px; }
+    #transcript { margin-top: 20px; max-width: 600px; margin-left: auto; margin-right: auto; text-align: left; }
+  </style>
+</head>
+<body>
+  <h1>🎙️ OTC Trading Bot</h1>
+  <button id="start">Start Conversation</button>
+  <div id="transcript"></div>
+
+  <script>
+    document.getElementById("start").onclick = async () => {
+      const res = await fetch('/get-token', { method: 'POST' });
+      const { token } = await res.json();
+
+      const client = new BlandWebClient('8909c009-67c1-4b9e-8321-8191f0ad9ae2', token);
+      await client.initConversation({ sampleRate: 44100 });
+
+      const transcriptBox = document.getElementById('transcript');
+      client.onTranscript = msg => {
+        transcriptBox.innerHTML += `<p><strong>User:</strong> ${msg.text}</p>`;
+      };
+      client.onResponse = msg => {
+        transcriptBox.innerHTML += `<p><strong>Bot:</strong> ${msg.message}</p>`;
+      };
+    };
+  </script>
+</body>
+</html>
