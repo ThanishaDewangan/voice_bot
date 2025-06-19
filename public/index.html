@@ -3,50 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <title>🎙️ OTC Trading Bot</title>
-  <script src="https://cdn.jsdelivr.net/npm/bland-web-sdk@1.1.0/dist/bland.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@bland-ai/web-sdk@0.1.9/dist/bland.min.js"></script>
   <style>
-    body {
-      font-family: sans-serif;
-      max-width: 600px;
-      margin: 40px auto;
-      padding: 0 20px;
-      text-align: center;
-    }
+    body { font-family: Arial, sans-serif; background: #f2f5f8; color:#333; }
+    .container { max-width:600px; margin:50px auto; padding:20px; background:white; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+    h1 { text-align:center; color:#4A4A4A; }
+    .buttons { text-align:center; margin-bottom:20px; }
     button {
-      padding: 12px 24px;
-      margin: 8px;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
+      padding:12px 24px; margin:0 10px; font-size:16px; border:none;
+      border-radius:5px; cursor:pointer; transition:background 0.2s;
     }
+    button#start {background:#28a745;color:white;}
+    button#start:hover {background:#218838;}
+    button#stop {background:#dc3545;color:white;}
+    button#stop:disabled {background:#f5c6cb;color:#721c24;cursor:not-allowed;}
     #transcript {
-      margin-top: 20px;
-      text-align: left;
-      height: 300px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      padding: 12px;
-      background: #f9f9f9;
-      font-size: 14px;
+      height:360px; overflow-y:auto; background:#fafafa; border:1px solid #ddd;
+      border-radius:5px; padding:15px; font-size:14px; color:#555;
     }
-    .entry {
-      margin-bottom: 8px;
-    }
-    .user { color: #0366d6; font-weight: bold; }
-    .bot { color: #5e2ca5; font-weight: bold; }
+    .entry {margin-bottom:12px;}
+    .entry.user::before {content:"👤 "; color:#007bff;}
+    .entry.bot::before {content:"🤖 "; color:#6f42c1;}
   </style>
 </head>
 <body>
-  <h1>🎙️ OTC Trading Bot</h1>
-  <button id="start">Start Conversation</button>
-  <button id="stop" disabled>Stop Conversation</button>
-  
-  <div id="transcript"></div>
+  <div class="container">
+    <h1>🎙️ OTC Trading Bot</h1>
+    <div class="buttons">
+      <button id="start">Start Conversation</button>
+      <button id="stop" disabled>Stop Conversation</button>
+    </div>
+    <div id="transcript"></div>
+  </div>
 
   <script>
     let client;
-
     const startBtn = document.getElementById('start');
     const stopBtn = document.getElementById('stop');
     const transcriptDiv = document.getElementById('transcript');
@@ -54,19 +45,25 @@
     startBtn.onclick = async () => {
       startBtn.disabled = true;
       stopBtn.disabled = false;
+      transcriptDiv.innerHTML = ''; 
 
-      const { token } = await fetch('/get-token', { method: 'POST' }).then(r => r.json());
+      const { token } = await fetch('/get-token', { method: 'POST' }).then(res => res.json());
       client = new BlandWebClient('f2882801-15e1-4c48-981a-265b13e7e79f', token);
-
-      await client.initConversation({ sampleRate: 44100 });
+      await client.initConversation({ sampleRate:44100 });
 
       client.onTranscript = msg => {
-        transcriptDiv.innerHTML += `<div class="entry user">User: ${msg.text}</div>`;
+        const div = document.createElement('div');
+        div.className = 'entry user';
+        div.textContent = msg.text;
+        transcriptDiv.appendChild(div);
         transcriptDiv.scrollTop = transcriptDiv.scrollHeight;
       };
 
       client.onResponse = msg => {
-        transcriptDiv.innerHTML += `<div class="entry bot">Bot: ${msg.message}</div>`;
+        const div = document.createElement('div');
+        div.className = 'entry bot';
+        div.textContent = msg.message;
+        transcriptDiv.appendChild(div);
         transcriptDiv.scrollTop = transcriptDiv.scrollHeight;
       };
 

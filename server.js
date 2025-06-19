@@ -34,25 +34,16 @@ app.post('/api/price', async (req, res) => {
 });
 
 app.post('/get-token', async (req, res) => {
-  try {
-    const response = await axios.post(
-      `https://api.bland.ai/v1/agents/${process.env.BLAND_AGENT_ID}/authorize`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.BLAND_API_KEY}`
-        }
+  const response = await axios.post(
+    `https://api.bland.ai/v1/agents/f2882801-15e1-4c48-981a-265b13e7e79f/authorize`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.BLAND_API_KEY}`
       }
-    );
-
-    res.json({ token: response.data.token });
-  } catch (err) {
-    console.error('Token fetch failed:', err.response?.data || err.message);
-    if (!res.headersSent) {
-      res.status(500).json({ error: 'Token fetch failed' });
     }
-  }
+  );
+  res.json({ token: response.data.token });
 });
-
 
 app.listen(PORT, () => console.log(`\uD83D\uDE80 Trading bot server running on port ${PORT}`));
