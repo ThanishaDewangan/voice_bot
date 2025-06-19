@@ -33,31 +33,30 @@ app.post('/api/price', async (req, res) => {
   }
 });
 
+const https = require('https');
+const httpsAgent = new https.Agent({ rejectUnauthorized: false });
+
 app.post('/get-token', async (req, res) => {
   try {
-    if (!process.env.BLAND_API_KEY) {
-      throw new Error('BLAND_API_KEY not set in environment variables');
-    }
     const response = await axios.post(
-      'https://web.bland.ai/api/v1/token',
+      'https://web.bland.ai/v1/token',
       { user_id: 'web_' + Date.now() },
       {
         headers: {
           Authorization: `Bearer ${process.env.BLAND_API_KEY}`
-        }
+        },
+        httpsAgent
       }
     );
-
-    if (!response.data || !response.data.token) {
-      throw new Error('Invalid response from Bland.ai API');
-    }
 
     res.json({ token: response.data.token });
   } catch (err) {
     console.error('Token fetch failed:', err.response?.data || err.message);
-    res.status(500).json({ error: 'Failed to get token', details: err.message });
-    res.status(500).json({ error: 'Token fetch failed' });
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Token fetch failed' });
+    }
   }
 });
+
 
 app.listen(PORT, () => console.log(`\uD83D\uDE80 Trading bot server running on port ${PORT}`));
