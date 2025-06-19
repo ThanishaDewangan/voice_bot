@@ -33,9 +33,6 @@ app.post('/api/price', async (req, res) => {
   }
 });
 
-const https = require('https');
-const httpsAgent = new https.Agent({ rejectUnauthorized: false });
-
 app.post('/get-token', async (req, res) => {
   try {
     const response = await axios.post(
