@@ -1,35 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>OTC Trading Bot</title>
-  <script src="https://cdn.bland.ai/web-client/dist/bland-web-client-lib.js"></script>
+  <meta charset="UTF-8" />
+  <title>🎙️ OTC Trading Bot</title>
+  <script src="https://cdn.jsdelivr.net/npm/bland-web-sdk@1.1.0/dist/bland.min.js"></script>
   <style>
-    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
-    button { padding: 10px 20px; font-size: 16px; margin: 10px; }
-    #transcript { margin-top: 20px; max-width: 600px; margin-left: auto; margin-right: auto; text-align: left; }
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 0 20px;
+      text-align: center;
+    }
+    button {
+      padding: 12px 24px;
+      margin: 8px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #transcript {
+      margin-top: 20px;
+      text-align: left;
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 12px;
+      background: #f9f9f9;
+      font-size: 14px;
+    }
+    .entry {
+      margin-bottom: 8px;
+    }
+    .user { color: #0366d6; font-weight: bold; }
+    .bot { color: #5e2ca5; font-weight: bold; }
   </style>
 </head>
 <body>
   <h1>🎙️ OTC Trading Bot</h1>
   <button id="start">Start Conversation</button>
+  <button id="stop" disabled>Stop Conversation</button>
+  
   <div id="transcript"></div>
 
   <script>
-    document.getElementById("start").onclick = async () => {
-      const res = await fetch('/get-token', { method: 'POST' });
-      const { token } = await res.json();
+    let client;
 
-      const client = new BlandWebClient('115c8721-3bd0-4921-8ee0-6a758e24a9c4', token);
+    const startBtn = document.getElementById('start');
+    const stopBtn = document.getElementById('stop');
+    const transcriptDiv = document.getElementById('transcript');
+
+    startBtn.onclick = async () => {
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+
+      const { token } = await fetch('/get-token', { method: 'POST' }).then(r => r.json());
+      client = new BlandWebClient('f2882801-15e1-4c48-981a-265b13e7e79f', token);
+
       await client.initConversation({ sampleRate: 44100 });
 
-      const transcriptBox = document.getElementById('transcript');
       client.onTranscript = msg => {
-        transcriptBox.innerHTML += `<p><strong>User:</strong> ${msg.text}</p>`;
+        transcriptDiv.innerHTML += `<div class="entry user">User: ${msg.text}</div>`;
+        transcriptDiv.scrollTop = transcriptDiv.scrollHeight;
       };
+
       client.onResponse = msg => {
-        transcriptBox.innerHTML += `<p><strong>Bot:</strong> ${msg.message}</p>`;
+        transcriptDiv.innerHTML += `<div class="entry bot">Bot: ${msg.message}</div>`;
+        transcriptDiv.scrollTop = transcriptDiv.scrollHeight;
       };
+
+      client.onEnded = () => {
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+      };
+    };
+
+    stopBtn.onclick = async () => {
+      if (client) {
+        await client.stopConversation();
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+      }
     };
   </script>
 </body>
